@@ -1,10 +1,11 @@
 image:
-  repository: kong
-  tag: "2.1"
+  repository: claudioed/kong-oidc-jwt
+  tag: latest
 
 env:
   prefix: /kong_prefix/
   database: "off"
+  plugins: bundled,oidc,kong-jwt2header
 
 admin:
   enabled: true
@@ -12,6 +13,10 @@ admin:
     enabled: true
     servicePort: 8001
     containerPort: 8001
+  tls:
+    parameters: []
+  labels:
+    enable-metrics: "true"
 
 postgresql:
   enabled: false
@@ -23,3 +28,18 @@ ingressController:
 podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "9542"
+  app: kong-kong-proxy
+  version: v1
+
+proxy:
+  type: NodePort
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+extraLabels:
+  app: kong-kong-proxy
+  version: v1
